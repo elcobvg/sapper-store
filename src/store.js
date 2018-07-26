@@ -3,7 +3,7 @@ import { Store as BaseStore } from 'svelte/store.js';
 const isDev = process.env.NODE_ENV === 'development' || false;
 
 /**
- * Svelte state management using common actions/mutations pattern
+ * Sapper / Svelte state management using common actions/mutations pattern
  * Based on https://github.com/hankchizljaw/vanilla-js-state-management
  */
 export default class Store extends BaseStore {
@@ -12,9 +12,10 @@ export default class Store extends BaseStore {
     // Call parent constructor
     process.browser ? super() : super(params.state);
 
-    // Add some default objects to hold our actions and mutations
+    // Add some default objects to hold our actions, mutations and getters
     this.actions = {};
     this.mutations = {};
+    this.getters = {};
 
     // A status enum to set during actions and mutations
     this.status = 'noop';
@@ -30,51 +31,55 @@ export default class Store extends BaseStore {
     }
 
     if(params.hasOwnProperty('getters')) {
-      const self = this;
-      const getters = new Proxy((params.getters || {}), {
-        get: (getters, key) => {
-          return getters[key].bind(self);
-        }
-      });
-      Object.assign(this, { ...getters });
+      this.getters = params.getters;
     }
 
     // Persist store state in local storage
-    const key = params.hasOwnProperty('key') ? params.key : '_sapper_store_key_';
-    if (process.browser) {
-      const json = window.localStorage.getItem(key);
-      this.status = 'mutation'; // Suppress warning
-      json && this.set(JSON.parse(json));
+    this.storeKey = params.hasOwnProperty('key') ? params.key : '_sapper_store_key_';
 
+    if (process.browser) {
       this.on('state', ({ current }) => {
-        window.localStorage.setItem(key, JSON.stringify(current));
+        window.localStorage.setItem(this.storeKey, JSON.stringify(current));
       })
     }
   }
 
   /**
-   * Init store on client side with data from server side
+   * Init store on client side with data from server side,
+   * or from localStorage if already available
+   * 
    * @param  {Object} data state data from server
    * @return {Store}
    */
   init (state = {}) {
+    const json = window.localStorage.getItem(this.storeKey);
     this.status = 'mutation'; // Suppress warning
-    this.set({ ...state });
+    json ? this.set(JSON.parse(json)) : this.set({ ...state });
     return this;
   }
 
   /**
    * Override parent 'get' method to retrieve value by key directly
+   * 
    * @param  {String} key
+   * @param  {Array} ...args
    * @return {Mixed}
    * @memberof Store
    */
-  get (key = null) {
-    return key ? super.get()[key] : super.get();
+  get (key = null, ...args) {
+    if (key) {
+      return this.getters.hasOwnProperty(key) 
+            ? this.getters[key].call(this, ...args)
+            : super.get()[key];
+    } 
+    // Default Svelte behaviour
+    return super.get();
   }
 
   /**
    * Override parent 'set' method to warn if trying to set state directly
+   * and dispatch state change event for listeners
+   * 
    * @param {Object} newState
    * @memberof Store
    */

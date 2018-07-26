@@ -23,6 +23,7 @@ Add a `/store` directory with the following files
 ````
 /store
  - actions.js
+ - getters.js
  - index.js
  - mutations.js
  - state.js
@@ -71,23 +72,42 @@ export default {
   ]
 };
 ````
+#### getters.js
+
+Optional getters can be added to the store in the following format:
+
+````javascript
+export default {
+  item (index = 0) {
+  	const { items } = this.get();
+  	return items[index];
+  },
+  itemCount () {
+  	// 'Old' Svelte syntax is supported:
+	return this.get('items').length;  	
+  }
+};
+````
+Call them in your app like this: `this.store.get('item', 1)`
+
 
 #### index.js
 
 This file ties all the parts together into a new `Store` object to use in your app: 
 
 ````javascript
-import Store from 'sapper-store';
+import Store from './store.js';
 import actions from './actions.js';
 import mutations from './mutations.js';
+import getters from './getters.js';
 import state from './state.js';
 
-// Optional key for your store
-const key = 'my-store-key';	
+const key = 'my-store-key';
 
 export default new Store({
   actions,
   mutations,
+  getters,
   state,
   key
 });
