@@ -1,0 +1,33 @@
+{
+  "main": "src/store.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "javascript",
+    "svelte",
+    "sapper",
+    "store",
+    "state",
+    "persist"
+  ],
+  "name": "sapper-store",
+  "description": "Sapper / Svelte state management using the well-known actions & mutations pattern",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elcobvg/sapper-store.git"
+  },
+  "author": "Elco Brouwer von Gonzenbach <elco.brouwer@gmail.com> (https://github.com/elcobvg)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elcobvg/sapper-store/issues"
+  },
+  "homepage": "https://github.com/elcobvg/sapper-store#readme",
+  "dependencies": {
+    "svelte": "^2.9.7"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}
