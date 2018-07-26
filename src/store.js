@@ -52,9 +52,9 @@ export default class Store extends BaseStore {
    * @return {Store}
    */
   init (state = {}) {
-    const json = window.localStorage.getItem(this.storeKey);
+    const json = window.localStorage.getItem(this.storeKey) || {};
     this.status = 'mutation'; // Suppress warning
-    json ? this.set(JSON.parse(json)) : this.set({ ...state });
+    this.set({ ...state, ...JSON.parse(json) });
     return this;
   }
 

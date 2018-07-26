@@ -79,12 +79,12 @@ Optional getters can be added to the store in the following format:
 ````javascript
 export default {
   item (index = 0) {
-  	const { items } = this.get();
-  	return items[index];
+    const { items } = this.get();
+    return items[index];
   },
   itemCount () {
-  	// 'Old' Svelte syntax is supported:
-	return this.get('items').length;  	
+    // 'Old' Svelte syntax is supported:
+    return this.get('items').length;  	
   }
 };
 ````
