@@ -3,7 +3,7 @@ import { Store as BaseStore } from 'svelte/store.js';
 const isDev = process.env.NODE_ENV === 'development' || false;
 
 /**
- * Sapper / Svelte state management using common actions/mutations pattern
+ * Svelte state management using common actions/mutations pattern
  * Based on https://github.com/hankchizljaw/vanilla-js-state-management
  */
 export default class Store extends BaseStore {
@@ -12,7 +12,7 @@ export default class Store extends BaseStore {
     // Call parent constructor
     process.browser ? super() : super(params.state);
 
-    // Add some default objects to hold our actions, mutations and state
+    // Add some default objects to hold our actions and mutations
     this.actions = {};
     this.mutations = {};
 
@@ -27,6 +27,16 @@ export default class Store extends BaseStore {
     
     if(params.hasOwnProperty('mutations')) {
       this.mutations = params.mutations;
+    }
+
+    if(params.hasOwnProperty('getters')) {
+      const self = this;
+      const getters = new Proxy((params.getters || {}), {
+        get: (getters, key) => {
+          return getters[key].bind(self);
+        }
+      });
+      Object.assign(this, { ...getters });
     }
 
     // Persist store state in local storage
@@ -142,6 +152,9 @@ export default class Store extends BaseStore {
     this.status = 'mutation';
 
     isDev && console.log(`MUTATION ${mutationKey}:`, payload);
+
+    // Dispatch mutation event for the components that are listening
+    process.browser && window.dispatchEvent(new CustomEvent('mutation', { detail: mutationKey }));
     
     // Get a new version of the state by running the mutation and storing the result of it
     let newState = this.mutations[mutationKey](this._state, payload);
