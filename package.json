@@ -13,9 +13,13 @@
     "state",
     "persist"
   ],
+  "files": [
+    "dist",
+    "src"
+  ],
   "name": "sapper-store",
   "description": "Sapper / Svelte state management using the well-known actions & mutations pattern",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/elcobvg/sapper-store.git"

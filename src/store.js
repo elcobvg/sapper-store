@@ -1,13 +1,13 @@
 import { Store as BaseStore } from 'svelte/store.js';
 
-const isDev = process.env.NODE_ENV === 'development' || false;
+const isDev = process.env.NODE_ENV === 'development';
 
 /**
  * Sapper / Svelte state management using common actions/mutations pattern
  * Based on https://github.com/hankchizljaw/vanilla-js-state-management
  */
 export default class Store extends BaseStore {
-  constructor(params) {
+  constructor (params) {
 
     // Call parent constructor
     process.browser ? super() : super(params.state);
@@ -22,15 +22,15 @@ export default class Store extends BaseStore {
 
     // Look in the passed params object for actions and mutations 
     // that might have been passed in
-    if(params.hasOwnProperty('actions')) {
+    if (params.hasOwnProperty('actions')) {
       this.actions = params.actions;
     }
     
-    if(params.hasOwnProperty('mutations')) {
+    if (params.hasOwnProperty('mutations')) {
       this.mutations = params.mutations;
     }
 
-    if(params.hasOwnProperty('getters')) {
+    if (params.hasOwnProperty('getters')) {
       this.getters = params.getters;
     }
 
@@ -52,9 +52,9 @@ export default class Store extends BaseStore {
    * @return {Store}
    */
   init (state = {}) {
-    const json = window.localStorage.getItem(this.storeKey) || {};
+    const json = JSON.parse(window.localStorage.getItem(this.storeKey)) || {};
     this.status = 'mutation'; // Suppress warning
-    this.set({ ...state, ...JSON.parse(json) });
+    this.set({ ...state, ...json });
     return this;
   }
 
@@ -111,7 +111,7 @@ export default class Store extends BaseStore {
    * @returns {Boolean}
    * @memberof Store
    */
-  dispatch(actionKey, payload) {
+  dispatch (actionKey, ...payload) {
       
     // Run a quick check to see if the action actually exists
     // before we try to run it
@@ -127,7 +127,7 @@ export default class Store extends BaseStore {
     this.status = 'action';
     
     // Actually call the action and pass it the Store context and whatever payload was passed
-    this.actions[actionKey](this, payload);
+    this.actions[actionKey](this, ...payload);
     
     // Close our console group to keep things nice and neat
     isDev && console.groupEnd();
@@ -144,7 +144,7 @@ export default class Store extends BaseStore {
    * @returns {Boolean}
    * @memberof Store
    */
-  commit(mutationKey, payload) {
+  commit (mutationKey, payload) {
     
     // Run a quick check to see if this mutation actually exists
     // before trying to run it
@@ -165,7 +165,7 @@ export default class Store extends BaseStore {
     let newState = this.mutations[mutationKey](this._state, payload);
     
     // Merge the old and new together to create a new state and set it
-    this.set({ ...Object.assign(this._state, newState) });
+    this.set({ ...this._state, ...newState });
 
     return true;
   }
