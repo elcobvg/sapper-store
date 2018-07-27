@@ -96,7 +96,7 @@ Call them in your app like this: `this.store.get('item', 1)`
 This file ties all the parts together into a new `Store` object to use in your app: 
 
 ````javascript
-import Store from './store.js';
+import Store from 'sapper-store';
 import actions from './actions.js';
 import mutations from './mutations.js';
 import getters from './getters.js';
