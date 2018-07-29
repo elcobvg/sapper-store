@@ -10,7 +10,11 @@ export default class Store extends BaseStore {
   constructor (params) {
 
     // Call parent constructor
-    process.browser ? super() : super(params.state);
+    if (params.hasOwnProperty('state') && !process.browser) {
+      super(params.state);
+    } else {
+      super();
+    }
 
     // Add some default objects to hold our actions, mutations and getters
     this.actions = {};
@@ -60,6 +64,7 @@ export default class Store extends BaseStore {
 
   /**
    * Override parent 'get' method to retrieve value by key directly
+   * and to enable 'getters' for our store
    * 
    * @param  {String} key
    * @param  {Array} ...args
