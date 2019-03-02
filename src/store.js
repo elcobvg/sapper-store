@@ -113,7 +113,7 @@ export default class Store extends BaseStore {
    *
    * @param {String} actionKey
    * @param {Mixed} payload
-   * @returns {Boolean}
+   * @returns {Mixed} action response
    * @memberof Store
    */
   dispatch (actionKey, ...payload) {
@@ -121,8 +121,7 @@ export default class Store extends BaseStore {
     // Run a quick check to see if the action actually exists
     // before we try to run it
     if(typeof this.actions[actionKey] !== 'function') {
-      console.error(`Action "${actionKey} doesn't exist.`);
-      return false;
+      throw new Error(`Action "${actionKey} doesn't exist.`);
     }
     
     // Create a console group which will contain the logs from our action and mutation
@@ -132,12 +131,12 @@ export default class Store extends BaseStore {
     this.status = 'action';
     
     // Actually call the action and pass it the Store context and whatever payload was passed
-    this.actions[actionKey](this, ...payload);
+    let result = this.actions[actionKey](this, ...payload);
     
     // Close our console group to keep things nice and neat
     isDev && console.groupEnd();
 
-    return true;
+    return result;
   }
 
   /**
